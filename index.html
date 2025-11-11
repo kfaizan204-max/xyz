@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Simple Google Sheet Example</title>
+</head>
+<body>
+<h2>Simple Sheet Input</h2>
+<input type="text" id="item" placeholder="Item">
+<input type="number" id="qty" placeholder="Quantity">
+<button onclick="save()">Save to Sheet</button>
+
+<h3>Sheet Data</h3>
+<ul id="dataList"></ul>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwT92w73szwbL7_YGO2BvueWvZ86TXtwREKuUNOVxgkOz1AyHwMS9D42HVNU-MQh1168A/exec"; // replace with your Apps Script URL
+
+async function save(){
+  const item = document.getElementById('item').value;
+  const qty = document.getElementById('qty').value;
+  if(!item || !qty) return alert("Fill both fields");
+
+  await fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({Item:item, Quantity:qty})
+  });
+  alert("Saved!");
+  loadData();
+}
+
+async function loadData(){
+  const res = await fetch(API_URL);
+  const data = await res.json();
+  const list = document.getElementById('dataList');
+  list.innerHTML = "";
+  data.forEach(r=>{
+    const li = document.createElement('li');
+    li.textContent = `${r[0]} - ${r[1]}`;
+    list.appendChild(li);
+  });
+}
+
+// load existing data on page load
+loadData();
+</script>
+</body>
+</html>

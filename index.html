@@ -14,35 +14,48 @@
 <ul id="dataList"></ul>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby35gzFBrQQVkU8-h1sov2G7rGib6XqN2Q-p2QgcAm20rnz4k9gT2yGUdcVR5jZ3H06Jg/exec"; // replace with your Apps Script URL
+const API_URL = "https://script.google.com/macros/s/AKfycbzwnholxCPt5daoeFc7sPrWfxNoOtmdZ8IBwhKdauAB_IlswSEMKTR7V-TyFmJDgbOvmw/exec"; // replace with your Web App URL
 
 async function save(){
   const item = document.getElementById('item').value;
   const qty = document.getElementById('qty').value;
   if(!item || !qty) return alert("Fill both fields");
 
-  await fetch(API_URL, {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({Item:item, Quantity:qty})
-  });
-  alert("Saved!");
-  loadData();
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({Item:item, Quantity:qty})
+    });
+    const result = await res.json();
+    if(result.status === "success"){
+      alert("✅ Saved!");
+      loadData();
+    } else {
+      alert("❌ Error saving: " + result.message);
+    }
+  } catch(err) {
+    alert("❌ Network or CORS error: " + err.message);
+  }
 }
 
 async function loadData(){
-  const res = await fetch(API_URL);
-  const data = await res.json();
-  const list = document.getElementById('dataList');
-  list.innerHTML = "";
-  data.forEach(r=>{
-    const li = document.createElement('li');
-    li.textContent = `${r[0]} - ${r[1]}`;
-    list.appendChild(li);
-  });
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const list = document.getElementById('dataList');
+    list.innerHTML = "";
+    data.forEach(r=>{
+      const li = document.createElement('li');
+      li.textContent = `${r[0]} - ${r[1]}`;
+      list.appendChild(li);
+    });
+  } catch(err) {
+    console.error(err);
+  }
 }
 
-// load existing data on page load
+// Load existing data on page load
 loadData();
 </script>
 </body>

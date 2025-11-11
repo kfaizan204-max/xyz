@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Simple Google Sheet Example</title>
+<title>Simple SheetDB Example</title>
 </head>
 <body>
 <h2>Simple Sheet Input</h2>
@@ -14,7 +14,7 @@
 <ul id="dataList"></ul>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzwnholxCPt5daoeFc7sPrWfxNoOtmdZ8IBwhKdauAB_IlswSEMKTR7V-TyFmJDgbOvmw/exec"; // replace with your Web App URL
+const API_URL = "https://sheetdb.io/api/v1/r2irpl8i0s9ki"; // replace with SheetDB API URL
 
 async function save(){
   const item = document.getElementById('item').value;
@@ -22,20 +22,16 @@ async function save(){
   if(!item || !qty) return alert("Fill both fields");
 
   try {
-    const res = await fetch(API_URL, {
+    await fetch(API_URL, {
       method: "POST",
       headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({Item:item, Quantity:qty})
+      body: JSON.stringify({data:{Item:item, Quantity:qty}})
     });
-    const result = await res.json();
-    if(result.status === "success"){
-      alert("✅ Saved!");
-      loadData();
-    } else {
-      alert("❌ Error saving: " + result.message);
-    }
+    alert("Saved!");
+    loadData();
   } catch(err) {
-    alert("❌ Network or CORS error: " + err.message);
+    console.error("Error:", err);
+    alert("❌ Failed to save data");
   }
 }
 
@@ -47,15 +43,15 @@ async function loadData(){
     list.innerHTML = "";
     data.forEach(r=>{
       const li = document.createElement('li');
-      li.textContent = `${r[0]} - ${r[1]}`;
+      li.textContent = `${r.Item} - ${r.Quantity}`;
       list.appendChild(li);
     });
   } catch(err) {
-    console.error(err);
+    console.error("Error loading data:", err);
   }
 }
 
-// Load existing data on page load
+// load existing data on page load
 loadData();
 </script>
 </body>
